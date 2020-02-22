@@ -1,0 +1,44 @@
+---
+- name: Creates directory
+  file:
+    path: $HOME/Desktop/Ansible/NSO
+    state: directory
+
+# Option 1 - Downloading the binary from tail-f repository
+- name: Download NSO and force basic auth
+  get_url:
+   url: "https://earth.tail-f.com:8443/ncs/nso-{{ version }}.darwin.x86_64.installer.bin"
+   dest: "$HOME/Desktop/Ansible/NSO/nso-{{ version }}.darwin.x86_64.installer.bin"
+   force_basic_auth: yes
+   validate_certs: no
+   url_username: "{{ username }}"
+   url_password: "{{ password }}"
+
+# Option 2 - Copying over the binary instead of downloading
+# - name:  Copy NSO to remote server
+#   copy:
+#     src: ~/sample.installer.bin
+#     dest: $HOME/Desktop/Ansible/NSO/ 
+
+- name: Extract NSO
+  shell: "sh $HOME/Desktop/Ansible/NSO/nso-{{ version }}.darwin.x86_64.installer.bin $HOME/Desktop/Ansible/NSO/nso-{{ version }}"
+  register: out2
+
+- name: Install NSO
+  shell: "source $HOME/Desktop/Ansible/NSO/nso-{{ version }}/ncsrc && ncs-setup --dest $HOME/Desktop/Ansible/NSO/ncs-run"
+
+- name: Start NSO
+  shell: "source $HOME/Desktop/Ansible/NSO/nso-{{ version }}/ncsrc && ncs"
+  args:
+    chdir: $HOME/Desktop/Ansible/NSO/ncs-run
+    
+- name: Show devices including operational data
+  nso_show:
+    url: http://localhost:8080/jsonrpc
+    username: admin
+    password: admin
+    path: /ncs:devices/
+    operational: true
+  register: shell_result
+- debug:
+    var: shell_result
