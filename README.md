@@ -5,6 +5,7 @@ Simple ansible role to deploy NSO server on a remote machine
 ## Requirements
 
 - Ansible
+- Python (Either 2.7 or 3)
 - Target machine must be a valid & reachable ansible host
 
 ## Usage
@@ -16,7 +17,7 @@ ansible-playbook -e "username=username password=password version=5.3" playbook.y
 ```
 Username and Password required to download NSO image from tail-f repository. 
 
-Alternatively can use the option of copying over the image from the local machine.
+Alternatively can use the option of copying over the image from the local machine, by uncommenting the copy function and commenting the download one.
 
 ## Example
 ![](Ansible_NSO_Setup.gif)
